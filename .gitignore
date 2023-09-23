@@ -1,0 +1,3 @@
+.terraform/*
+.terraform.lock.hcl
+export-tf-vars-copy.sh
