@@ -38,7 +38,7 @@ resource "aws_lb_target_group" "alb_client_target_group" {
     enabled             = true
     interval            = 30
     path                = "/"
-    port                = 3000
+    port                = 80
     protocol            = "HTTP"
     healthy_threshold   = 3
     unhealthy_threshold = 3
@@ -210,7 +210,7 @@ resource "aws_iam_role" "ecs_task_execution_role" {
     ]
   })
 }
-resource "aws_iam_policy" "custom_policy" {
+resource "aws_iam_policy" "custom_policy_task_execution_role" {
   name        = "ftbClientECSTaskExecutionRole-policy"
   description = "Custom IAM policy for Fargate client task execution role"
 
@@ -230,8 +230,28 @@ resource "aws_iam_policy" "custom_policy" {
     ],
   })
 }
-resource "aws_iam_role_policy_attachment" "custom_policy_attachment" {
-  policy_arn = aws_iam_policy.custom_policy.arn
+resource "aws_iam_policy" "custom_policy_task_role" {
+  name        = "ftbClientECSTaskRole-policy"
+  description = "Custom IAM policy for Fargate client task role"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action   = ["ecs:RunTask", "ecs:StopTask", "ecs:DescribeTasks", "ssm:GetParameters", "ecr:GetAuthorizationToken", "ecr:BatchCheckLayerAvailability", "ecr:GetDownloadUrlForLayer", "ecr:BatchGetImage"],
+        Effect   = "Allow",
+        Resource = "*",
+      },
+      {
+        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+        Effect   = "Allow",
+        Resource = "arn:aws:logs:*:*:*",
+      }
+    ],
+  })
+}
+resource "aws_iam_role_policy_attachment" "custom_policy_attachment_task_execution_role" {
+  policy_arn = aws_iam_policy.custom_policy_task_execution_role.arn
   role       = aws_iam_role.ecs_task_execution_role.name
 }
 
@@ -250,7 +270,10 @@ resource "aws_iam_role" "ecs_task_role" {
     ]
   })
 }
-
+resource "aws_iam_role_policy_attachment" "custom_policy_attachment_task_role" {
+  policy_arn = aws_iam_policy.custom_policy_task_role.arn
+  role       = aws_iam_role.ecs_task_role.name
+}
 // Define to Fargate what it needs to run by creating a task definition
 // We don't link the task definition to the service since if we would update other parts of the infra
 // Terraform wants to udpate the task definition again. This is just used to create the resource.
