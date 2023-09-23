@@ -275,8 +275,9 @@ resource "aws_iam_role_policy_attachment" "custom_policy_attachment_task_role" {
   role       = aws_iam_role.ecs_task_role.name
 }
 // Define to Fargate what it needs to run by creating a task definition
-// We don't link the task definition to the service since if we would update other parts of the infra
-// Terraform wants to udpate the task definition again. This is just used to create the resource.
+// Based on the terraform variable 'first_run' we will link this task definition if it is our first infastructure deployment
+// Or we will fetch the latest revision via aws_ecs_task_definition.previous to prevent terraform from changing
+// Our revision every time we make a new deployment
 resource "aws_ecs_task_definition" "client_task_definition" {
   container_definitions = jsonencode([{
     essential    = true,
@@ -292,11 +293,7 @@ resource "aws_ecs_task_definition" "client_task_definition" {
   memory                   = 512
   requires_compatibilities = ["FARGATE"]
 }
-// This parts is to help is in further infrastructure deployments.
-// Image you create updates in another part of your infra (ex. create an s3 bucket). Terraform needs to know
-// that the task definition linked to the service should always be the one with the latest revision.
-// To achieve this we fetch the latest task definition here and link it to our service.
-// It's important to not link the task definition we created above since that ARN will be linked to revision 1
+
 data "aws_ecs_task_definition" "previous" {
   count           = var.first_run == "0" ? 1 : 0
   task_definition = "ftb-client-task-definition"
