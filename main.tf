@@ -172,20 +172,6 @@ resource "aws_iam_role" "ecs_task_role" {
   })
 }
 
-resource "aws_iam_policy" "custom_task_policy" {
-  name        = "ftbClientECSTaskRole-policy"
-  description = "Custom IAM policy for Fargate client task role"
-
-  policy = jsonencode({
-    Version   = "2012-10-17",
-    Statement = [],
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "custom_task_policy_attachment" {
-  policy_arn = aws_iam_policy.custom_task_policy.arn
-  role       = aws_iam_role.ecs_task_role.name
-}
 // Define to Fargate what it needs to run by creating a task definition
 // We don't link the task definition to the service since if we would update other parts of the infra
 // Terraform wants to udpate the task definition again. This is just used to create the resource.
@@ -211,7 +197,7 @@ resource "aws_ecs_task_definition" "client_task_definition" {
 // It's important to not link the task definition we created above since that ARN will be linked to revision 1
 data "aws_ecs_task_definition" "previous" {
   count           = var.first_run == "0" ? 1 : 0
-  task_definition = "ftb-task-definition"
+  task_definition = "ftb-client-task-definition"
 }
 // Create te service
 resource "aws_ecs_service" "client_ecs_service" {
