@@ -57,6 +57,71 @@ resource "aws_lb_listener" "alb_client_listener_http" {
   }
 }
 
+// ECS service needs to be able to communicate with ECR service.
+// For this we create VPC Endpoints
+resource "aws_security_group" "ecs_vpce_service_sg" {
+  name        = "ftb-ecs-vpce-sg"
+  description = "Allow incoming http/HTTPS traffic"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port        = 80
+    to_port          = 80
+    protocol         = "TCP"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  ingress {
+    from_port        = 443
+    to_port          = 443
+    protocol         = "TCP"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  egress {
+    from_port        = 80
+    to_port          = 80
+    protocol         = "TCP"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  egress {
+    from_port        = 443
+    to_port          = 443
+    protocol         = "TCP"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+}
+
+resource "aws_vpc_endpoint" "ecr_dkr_vpce" {
+  vpc_id            = var.vpc_id
+  service_name      = "com.amazonaws.eu-west-1.ecr.dkr"
+  vpc_endpoint_type = "Interface"
+  security_group_ids = [
+    aws_security_group.ecs_vpce_service_sg.id
+  ]
+  subnet_ids = split(",", var.subnet_ids)
+
+  tags = {
+    "Name" : "ftb-ecs-dkr-vpce"
+  }
+  private_dns_enabled = true
+}
+resource "aws_vpc_endpoint" "ecr_api_vpce" {
+  vpc_id            = var.vpc_id
+  service_name      = "com.amazonaws.eu-west-1.ecr.api"
+  vpc_endpoint_type = "Interface"
+  security_group_ids = [
+    aws_security_group.ecs_vpce_service_sg.id
+  ]
+  subnet_ids = split(",", var.subnet_ids)
+  tags = {
+    "Name" : "ftb-ecs-api-vpce"
+  }
+  private_dns_enabled = true
+}
+
 
 // Create ECR repository where Client docker file will be uploaded
 resource "aws_ecr_repository" "client_ecr_repository" {
