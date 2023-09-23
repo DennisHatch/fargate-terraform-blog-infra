@@ -20,7 +20,7 @@ resource "aws_security_group" "ftb_client_alb_sg" {
   }
 }
 resource "aws_lb" "client_alb" {
-  name               = "atb-alb-client"
+  name               = "ftb-alb-client"
   load_balancer_type = "application"
   security_groups = [
     aws_security_group.ftb_client_alb_sg.id
