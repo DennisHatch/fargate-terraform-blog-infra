@@ -102,15 +102,15 @@ resource "aws_vpc_endpoint" "s3_api_vpce_gw" {
   service_name      = "com.amazonaws.eu-west-1.s3"
   vpc_endpoint_type = "Gateway"
   tags = {
-    "Name" : "regeringsrobot-ecs-api-s3-gw"
+    "Name" : "ftb-ecs-api-s3-gw"
   }
 }
 // Here we link the default routing table to the VPC GW Endpoint.
 // This makes sure that our network can route traffic from ECR to S3
-#resource "aws_vpc_endpoint_route_table_association" "example" {
-#  vpc_endpoint_id = aws_vpc_endpoint.s3_api_vpce_gw.id
-#  route_table_id  = var.routing_table_id
-#}
+resource "aws_vpc_endpoint_route_table_association" "example" {
+  vpc_endpoint_id = aws_vpc_endpoint.s3_api_vpce_gw.id
+  route_table_id  = var.routing_table_id
+}
 resource "aws_vpc_endpoint" "ecr_dkr_vpce" {
   vpc_id            = var.vpc_id
   service_name      = "com.amazonaws.eu-west-1.ecr.dkr"
@@ -379,7 +379,7 @@ resource "aws_appautoscaling_target" "ecs_service_target" {
 }
 
 resource "aws_appautoscaling_policy" "ecs_service_scaling_policy" {
-  name               = "regeringsrobot-ecs-service-scaling-policy"
+  name               = "ftb-ecs-service-scaling-policy"
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.ecs_service_target.resource_id
   scalable_dimension = aws_appautoscaling_target.ecs_service_target.scalable_dimension
