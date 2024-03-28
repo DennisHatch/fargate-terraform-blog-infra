@@ -1,6 +1,9 @@
 # Terraform project used for the Fargate Terraform blog
 
 This is an example repository to make an ECS fargate setup with terraform. In this blog you will see the prefix 'ftb' meaning: Fargate Terraform Blog.
+
+The point of this repository is the ability to have a skeleton Terraform project. \
+You should just be able to deploy this Terraform project and have an up and running project.
 ## Prerequisites
 * This project assumes you have valid AWS credentials in your environment variables or [/.aws/credentials]((https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)) file.
 * [Terraform CLI](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)

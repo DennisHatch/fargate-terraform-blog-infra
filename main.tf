@@ -107,10 +107,10 @@ resource "aws_vpc_endpoint" "s3_api_vpce_gw" {
 }
 // Here we link the default routing table to the VPC GW Endpoint.
 // This makes sure that our network can route traffic from ECR to S3
-resource "aws_vpc_endpoint_route_table_association" "example" {
-  vpc_endpoint_id = aws_vpc_endpoint.s3_api_vpce_gw.id
-  route_table_id  = var.routing_table_id
-}
+#resource "aws_vpc_endpoint_route_table_association" "example" {
+#  vpc_endpoint_id = aws_vpc_endpoint.s3_api_vpce_gw.id
+#  route_table_id  = var.routing_table_id
+#}
 resource "aws_vpc_endpoint" "ecr_dkr_vpce" {
   vpc_id            = var.vpc_id
   service_name      = "com.amazonaws.eu-west-1.ecr.dkr"
