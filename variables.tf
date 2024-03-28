@@ -7,7 +7,4 @@ variable "vpc_id" {
 variable "routing_table_id" {
   type = string
 }
-variable "first_run" {
-  type = string
-}
   

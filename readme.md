@@ -12,7 +12,6 @@ The project relies on a few external parameters. These variables need to be ente
 | vpc_id           | NA            | ID of the VPC our stack will be deployed in                                                                                    |
 | subnet_ids       | NA            | Comma seperated list of subnet IDs our infrastructure will be deployed in for multi-AZ                                         |
 | routing_table_id | NA            | ID if the main routing table that will be associated with the S3 GW VPC-Endpoint                                               |
-| create_shared    | false         | Boolean checking if the current terraform deploy should created the resources which are shared across application environments |
 
 ## Running terraform
 You can run the current terraform config with 
